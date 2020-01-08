@@ -5,21 +5,21 @@ package com.p2.statemachine;
 public class SyncStateMachine extends AbstractStateMachine {
 	private static final long serialVersionUID = 1L;
 
-	private final Object m_objSync;
-	transient private boolean m_bHandlingEvent = false;
+	private final Object objSync;
+	transient private boolean bHandlingEvent = false;
 
 	protected SyncStateMachine() {
-		m_objSync = this;
+		objSync = this;
 	}
 
 	public SyncStateMachine(Object context) {
 		super(context);
-		m_objSync = this;
+		objSync = this;
 	}
 
 	public SyncStateMachine(Object sOwner, Object objSync) {
 		super(sOwner);
-		m_objSync = objSync;
+		this.objSync = objSync;
 	}
 
 
@@ -32,16 +32,16 @@ public class SyncStateMachine extends AbstractStateMachine {
 	protected State postEventInternal(Object event) throws StateException {
 		State newState;
 		State oldState;
-		synchronized (m_objSync) {
+		synchronized (objSync) {
 			oldState = getState();
 			try {
-				if (m_bHandlingEvent) {
+				if (bHandlingEvent) {
 					throw new RuntimeException("Nested postEventAndWait()");
 				}
-				m_bHandlingEvent = true;
+				bHandlingEvent = true;
 				newState = onEvent(event);
 			} finally {
-				m_bHandlingEvent = false;
+				bHandlingEvent = false;
 			}
 		}
 		if (null != newState) {
@@ -67,6 +67,6 @@ public class SyncStateMachine extends AbstractStateMachine {
 	}
 
 	protected Object getSyncObject() {
-		return m_objSync;
+		return objSync;
 	}
 }

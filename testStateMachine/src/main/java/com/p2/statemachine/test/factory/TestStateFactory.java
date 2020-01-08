@@ -12,10 +12,8 @@ public class TestStateFactory extends AbstractTestStateFactory {
     private static final Logger log = Logger.getLogger(TestStateFactory.class);
 
     @Override
-    public State getState(int iType)
-    {
-        switch (iType)
-        {
+    public State getState(int iType) {
+        switch (iType) {
             case TestStateConstatnts.ST_NOT_INITILIZED:
                 return new TestNotInitState(TestStateConstatnts.ST_NOT_INITILIZED);
 

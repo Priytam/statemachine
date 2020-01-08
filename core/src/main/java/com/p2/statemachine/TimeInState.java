@@ -4,20 +4,20 @@ import java.io.Serializable;
 public class TimeInState implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private long m_lStateEntryTime;
-	private long m_lStateExitTime;
-	private long m_lStateTotalTime;
+	private long lStateEntryTime;
+	private long lStateExitTime;
+	private long lStateTotalTime;
 
 
 	public TimeInState(long start, long end, long total) {
-		m_lStateEntryTime = start;
-		m_lStateExitTime = end;
-		m_lStateTotalTime = total;
+		lStateEntryTime = start;
+		lStateExitTime = end;
+		lStateTotalTime = total;
 	}
 
 	@Override
 	public String toString() {
-		return "TimeInState [m_lStateEntryTime=" + m_lStateEntryTime + ", m_lStateExitTime=" + m_lStateExitTime + ", m_lStateTotalTime=" + m_lStateTotalTime
+		return "TimeInState [lStateEntryTime=" + lStateEntryTime + ", lStateExitTime=" + lStateExitTime + ", lStateTotalTime=" + lStateTotalTime
 				+ "]";
 	}
 
@@ -34,26 +34,26 @@ public class TimeInState implements Serializable {
 	}
 
 	public long getStateEntryTime() {
-		return m_lStateEntryTime;
+		return lStateEntryTime;
 	}
 
 	public void setStateEntryTime(long start) {
-		m_lStateEntryTime = start;
+		lStateEntryTime = start;
 	}
 
 	public long getStateExitTime() {
-		return m_lStateExitTime;
+		return lStateExitTime;
 	}
 
 	public void setStateExitTime(long end) {
-		m_lStateExitTime = end;
+		lStateExitTime = end;
 	}
 
 	public long getStateTotalTime() {
-		return m_lStateTotalTime;
+		return lStateTotalTime;
 	}
 
 	public void setStateTotalTime(long total) {
-		m_lStateTotalTime = total;
+		lStateTotalTime = total;
 	}
 }

@@ -2,6 +2,7 @@ package com.p2.statemachine;
 
 import com.p2.async.AsyncMessageQueue;
 import com.p2.async.IAsyncMessageHandler;
+import com.p2.statemachine.iface.StateOwner;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -26,13 +27,24 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class StateMachine extends AbstractStateMachine implements Serializable, IAsyncMessageHandler {
 	private static final long serialVersionUID = -3624053223595674494L;
 	transient private static Logger log = Logger.getLogger(StateMachine.class);
-	private transient AsyncMessageQueue m_asyncMessageQueue;
-	private transient ThreadLocal<Integer> m_handleEventDepth = new ThreadLocal<Integer>();
+	private transient AsyncMessageQueue asyncMessageQueue;
+	private transient ThreadLocal<Integer> handleEventDepth = new ThreadLocal<Integer>();
 
-	public StateMachine(Object owner, int maxPendingEvents, ThreadPoolExecutor threadPool) {
-		super(owner);
-		m_asyncMessageQueue = new AsyncMessageQueue(maxPendingEvents, threadPool, this);
-		setOwner(owner);
+	public StateMachine(Object context, int maxPendingEvents, ThreadPoolExecutor threadPool) {
+		super(context);
+		asyncMessageQueue = new AsyncMessageQueue(maxPendingEvents, threadPool, this);
+		StateMachine machine = this;
+		setOwner(new StateOwner() {
+            @Override
+            public AbstractStateMachine getStateMachine() {
+                return machine;
+            }
+
+            @Override
+            public Object getContext() {
+                return context;
+            }
+        });
 	}
 
 	/**
@@ -54,7 +66,7 @@ public class StateMachine extends AbstractStateMachine implements Serializable, 
 	 */
 	@Override
 	public boolean postEvent(Object event) {
-		return m_asyncMessageQueue.postMessage(event);
+		return asyncMessageQueue.postMessage(event);
 	}
 
 	public boolean postEventAndWait(Object event, long timeoutMilli) throws Throwable {
@@ -71,11 +83,11 @@ public class StateMachine extends AbstractStateMachine implements Serializable, 
 
 
 	public void setThreadPool(ThreadPoolExecutor threadpool) {
-		m_asyncMessageQueue.setThreadPool(threadpool);
+		asyncMessageQueue.setThreadPool(threadpool);
 	}
 
 	private boolean inHandleEvent() {
-		Integer depth = m_handleEventDepth.get();
+		Integer depth = handleEventDepth.get();
 		if (depth == null) {
 			return false;
 		}
@@ -86,19 +98,19 @@ public class StateMachine extends AbstractStateMachine implements Serializable, 
 	}
 
 	private void incrementHandleEventDepth() {
-		Integer depth = m_handleEventDepth.get();
+		Integer depth = handleEventDepth.get();
 		if (depth == null) {
 			depth = Integer.valueOf(1);
 		} else {
 			depth = Integer.valueOf(depth.intValue() + 1);
 		}
-		m_handleEventDepth.set(depth);
+		handleEventDepth.set(depth);
 	}
 
 	private void decrementHandleEventDepth() {
-		Integer depth = m_handleEventDepth.get();
+		Integer depth = handleEventDepth.get();
 		depth = Integer.valueOf(depth.intValue() - 1);
-		m_handleEventDepth.set(depth);
+		handleEventDepth.set(depth);
 	}
 
 
@@ -114,7 +126,7 @@ public class StateMachine extends AbstractStateMachine implements Serializable, 
 	 * Remove all pending events from the queue
 	 */
 	public void clearPendingEvents() {
-		m_asyncMessageQueue.clearPendingMessages(null);
+		asyncMessageQueue.clearPendingMessages(null);
 	}
 
 
@@ -132,7 +144,7 @@ public class StateMachine extends AbstractStateMachine implements Serializable, 
 
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
-		m_asyncMessageQueue = new AsyncMessageQueue();
+		asyncMessageQueue = new AsyncMessageQueue();
 	}
 
 	@Override

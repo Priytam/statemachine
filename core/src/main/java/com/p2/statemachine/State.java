@@ -1,14 +1,12 @@
 package com.p2.statemachine;
 
+import com.p2.statemachine.iface.ExpirableState;
 import com.p2.statemachine.iface.IState;
 import com.p2.statemachine.iface.IStateMachine;
-import com.p2.statemachine.iface.IStateOwner;
+import com.p2.statemachine.iface.StateOwner;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Definition:
@@ -32,10 +30,10 @@ import java.util.Vector;
  */
 abstract public class State implements IState {
 	transient private static Logger log = Logger.getLogger(State.class);
-	// holding all sub states
-	protected Vector<State> m_vecSubStates = new Vector<State>();
 	private final static long serialVersionUID = 3338576081780974136L;
-	private int m_iStateType;
+	// holding all sub states
+	protected Vector<State> vecSubStates = new Vector<State>();
+	private int iStateType;
 
 	/**
 	 * State constructor
@@ -53,7 +51,7 @@ abstract public class State implements IState {
 	 * @see :
 	 */
 	public void addSubState(State subState) {
-		m_vecSubStates.addElement(subState);
+		vecSubStates.addElement(subState);
 	}
 
 	/**
@@ -63,11 +61,11 @@ abstract public class State implements IState {
 	 * As a result of this call the state will be updated with the new state
 	 * <p>
 	 *
-	 * @param context  Object
+	 * @param stateOwner  Object
 	 * @param newState
 	 * @param index    int
 	 */
-	public void changeState(Object context, State newState, int index) throws StateException {
+	public void changeState(StateOwner stateOwner, State newState, int index) throws StateException {
 
 		if (log.isDebugEnabled()) {
 			log.debug("changeState: current="
@@ -75,10 +73,10 @@ abstract public class State implements IState {
 					+ " replace state to" + newState.toString());
 		}
 
-		State oldState = m_vecSubStates.get(index);
-		oldState.onGlobalExit(context, newState);
-		m_vecSubStates.set(index, newState);
-		newState.onGlobalEntry(context, oldState);
+		State oldState = vecSubStates.get(index);
+		oldState.onGlobalExit(stateOwner, newState);
+		vecSubStates.set(index, newState);
+		newState.onGlobalEntry(stateOwner, oldState);
 	}
 
 	/**
@@ -92,7 +90,7 @@ abstract public class State implements IState {
 		Object o = null;
 		try {
 			o = super.clone();
-			((State) o).m_vecSubStates = (Vector<State>) m_vecSubStates.clone();
+			((State) o).vecSubStates = (Vector<State>) vecSubStates.clone();
 		} catch (CloneNotSupportedException ex) {
 			log.warn("clone(): CloneNotSupported");
 		}
@@ -114,7 +112,7 @@ abstract public class State implements IState {
 	 * delete a state from then vector
 	 */
 	public void deleteSubState(State theState) {
-		m_vecSubStates.removeElement(theState);
+		vecSubStates.removeElement(theState);
 	}
 
 	/**
@@ -137,8 +135,8 @@ abstract public class State implements IState {
 		List<Integer> lSubState;
 		// do on exit from the current state and go on the vector
 		// go through the vector and call to on Exit
-		for (int i = 0; i < m_vecSubStates.size(); i++) {
-			lSubState = m_vecSubStates.elementAt(i).getGlobalSetType();
+		for (int i = 0; i < vecSubStates.size(); i++) {
+			lSubState = vecSubStates.elementAt(i).getGlobalSetType();
 			l.addAll(lSubState);
 		}
 		Integer i = Integer.valueOf(getStateType());
@@ -153,7 +151,7 @@ abstract public class State implements IState {
 	 */
 	@Override
 	public int getStateType() {
-		return m_iStateType;
+		return iStateType;
 	}
 
 	/**
@@ -165,7 +163,7 @@ abstract public class State implements IState {
 	 * @see :
 	 */
 	public Vector<State> getVecSubStates() {
-		return m_vecSubStates;
+		return vecSubStates;
 	}
 
 	/**
@@ -175,25 +173,25 @@ abstract public class State implements IState {
 	 * new state it means that we need to change the state to the new state, before
 	 * doing so we should check if the substate is supported by us.
 	 *
-	 * @param context  java.lang.Object
+	 * @param stateOwner  java.lang.Object
 	 * @param owner
 	 * @param event    java.lang.Object
 	 * @param index    int
 	 * @return State
 	 */
-	protected State handleEvent(Object context, State owner, Object event, int index) throws StateException {
+	protected State handleEvent(StateOwner stateOwner, State owner, Object event, int index) throws StateException {
 		if (log.isDebugEnabled()) {
 			log.debug("handleEvent (context,owner,event,index) - "
 					+ this.toString() + ": event=" + event.toString());
 		}
-		Vector<State> vecSubStates = new Vector<State>(m_vecSubStates);
+		Vector<State> vecSubStates = new Vector<State>(this.vecSubStates);
 		State newState = null;
 		try {
 			// check if the current state now what to do with this event.
-			newState = onEvent(context, event);
+			newState = onEvent(stateOwner.getContext(), event);
 		} catch (StateException e) {
 			log.info("Exception: got exception from " +
-					this.toString() + "(onEvent): " + event + " exception: " + e + " context: " + context);
+					this.toString() + "(onEvent): " + event + " exception: " + e + " context: " + stateOwner.getContext());
 			throw e;
 			//return null;
 		}
@@ -206,7 +204,7 @@ abstract public class State implements IState {
 			int subIndex = 0;
 			while (e.hasMoreElements()) {
 				State subState = e.nextElement();
-				newState = subState.handleEvent(context, this, event, subIndex);
+				newState = subState.handleEvent(stateOwner, this, event, subIndex);
 				if (log.isDebugEnabled()) {
 					log.debug("handleEvent(4 params): checking vector - "
 							+ subState.toString());
@@ -215,7 +213,7 @@ abstract public class State implements IState {
 					// substate return a state check if this state
 					// is supported by us if we do change the state.
 					if (isSubStateSupported(newState)) {
-						changeState(context, newState, subIndex);
+						changeState(stateOwner, newState, subIndex);
 					}
 					// return the new state.
 					else {
@@ -226,7 +224,7 @@ abstract public class State implements IState {
 			}
 			// no new state.
 			try {
-				newState = completeHandleEvent(context, event);
+				newState = completeHandleEvent(stateOwner.getContext(), event);
 			} catch (StateException ex) {
 				log.info("Exception: got exception from " +
 						this.toString() + "(completeHandleEvent): " + ex);
@@ -247,21 +245,21 @@ abstract public class State implements IState {
 	 * <p>
 	 * Creation date: (03/15/2001 3:06:49 PM)
 	 *
-	 * @param context java.lang.Object
+	 * @param owner java.lang.Object
 	 * @param event
 	 */
-	public State handleEvent(Object context, Object event) throws StateException {
+	public State handleEvent(StateOwner owner, Object event) throws StateException {
 		if (log.isDebugEnabled()) {
 			log.debug("handleEvent (context,event) - "
 					+ this.toString() + ": event="
 					+ event.toString());
 		}
 
-		Vector<State> vecSubStates = new Vector<State>(m_vecSubStates);
+		Vector<State> vecSubStates = new Vector<State>(this.vecSubStates);
 		State newState = null;
 		try {
 			// check if the current state know what to do with this event.
-			newState = onEvent(context, event);
+			newState = onEvent(owner.getContext(), event);
 		} catch (StateException e) {
 			log.info("Exception: got exception from " +
 					this.toString() + "(onEvent): " + e);
@@ -275,10 +273,10 @@ abstract public class State implements IState {
 		int subIndex = 0;
 		while (e.hasMoreElements()) {
 			State subState = e.nextElement();
-			newState = subState.handleEvent(context, this, event, subIndex);
+			newState = subState.handleEvent(owner, this, event, subIndex);
 			if (null != newState) {
 				if (isSubStateSupported(newState)) {
-					changeState(context, newState, subIndex);
+					changeState(owner, newState, subIndex);
 				} else {
 					return newState;
 				}
@@ -287,7 +285,7 @@ abstract public class State implements IState {
 		}
 		// no new state.
 		try {
-			newState = completeHandleEvent(context, event);
+			newState = completeHandleEvent(owner.getContext(), event);
 		} catch (StateException ex) {
 			log.info("Exception: got exception from " +
 					this.toString() + "(completeHandleEvent): " + ex);
@@ -315,7 +313,7 @@ abstract public class State implements IState {
 		}
 		if (null == answer) {
 			// go recursive till some one knows how to handle the request.
-			Enumeration<State> e = m_vecSubStates.elements();
+			Enumeration<State> e = vecSubStates.elements();
 			while (e.hasMoreElements()) {
 				State subState = e.nextElement();
 				answer = subState.handleRequest(context, this, request);
@@ -369,58 +367,61 @@ abstract public class State implements IState {
 	/**
 	 * call recursive to onEntry.*
 	 * @param fromState
-	 * @param context
+	 * @param owner
 	 */
-	public final void onGlobalEntry(Object context, State fromState) throws StateException {
+	public final void onGlobalEntry(StateOwner owner, State fromState) throws StateException {
 		if (log.isDebugEnabled()) {
-			log.debug("onGlobalEntry: " + this.toString() + " context: " + context);
+			log.debug("onGlobalEntry: " + this.toString() + " context: " + owner.getContext());
 		}
 
 		// update state machine with entry/exit
-		// TODO remove this RTTI for better performance
-		if (context instanceof IStateOwner) {
-			IStateOwner stateOwner = (IStateOwner) context;
-			IStateMachine stateMachine = stateOwner.getStateMachine();
-			stateMachine.recordStateEntry(this);
-		}
+		IStateMachine stateMachine = owner.getStateMachine();
+		stateMachine.recordStateEntry(this);
 
 		// do on exit from the current state and go on the vector
-		onEntry(context, fromState);
+		onEntry(owner.getContext(), fromState);
+		performSpecificOnGlobalEntry(owner, fromState);
 		// go through the vector and call to on Exit
-		for (int i = 0; i < m_vecSubStates.size(); i++) {
-			m_vecSubStates.elementAt(i).onGlobalEntry(context, fromState);
+		for (int i = 0; i < vecSubStates.size(); i++) {
+			vecSubStates.elementAt(i).onGlobalEntry(owner, fromState);
+			vecSubStates.elementAt(i).performSpecificOnGlobalEntry(owner, fromState);
 		}
+
+	}
+
+	protected  void performSpecificOnGlobalEntry(StateOwner owner, State fromState) {
+
 	}
 
 	/**
 	 * Call recursive to onExit
 	 *
 	 * @param newState
-	 * @param context
+	 * @param owner
 	 */
-	public final void onGlobalExit(Object context, State newState) throws StateException {
+	public final void onGlobalExit(StateOwner owner, State newState) throws StateException {
 		if (log.isDebugEnabled()) {
-			log.debug("onGlobalExit: " + this.toString() + " context " + context);
+			log.debug("onGlobalExit: " + this.toString() + " context " + owner.getContext());
 		}
 		// go recursivlly down the vector
-		for (int i = 0; i < m_vecSubStates.size(); i++) {
-			m_vecSubStates.elementAt(i).onGlobalExit(context, newState);
+		for (int i = 0; i < vecSubStates.size(); i++) {
+			vecSubStates.elementAt(i).onGlobalExit(owner, newState);
+			vecSubStates.elementAt(i).performSpecificOnGlobalExit(owner, newState);
 		}
 
 		// do "onExit" from the current state
-		onExit(context, newState);
-
-		// update state machine with entry/exit
-		// TODO remove this RTTI better performance
-		if (context instanceof IStateOwner) {
-			IStateOwner stateOwner = (IStateOwner) context;
-			IStateMachine stateMachine = stateOwner.getStateMachine();
-			stateMachine.recordStateExit(this);
-		}
+		onExit(owner.getContext(), newState);
+		performSpecificOnGlobalExit(owner, newState);
+		IStateMachine stateMachine = owner.getStateMachine();
+		stateMachine.recordStateExit(this);
 	}
 
-	public void onRestore(IStateOwner owner) {
-		for (Object oState : m_vecSubStates) {
+	protected  void performSpecificOnGlobalExit(StateOwner owner, State fromState) {
+
+	}
+
+	public void onRestore(StateOwner owner) {
+		for (Object oState : vecSubStates) {
 			State state = (State) oState;
 			state.onRestore(owner);
 		}
@@ -431,24 +432,24 @@ abstract public class State implements IState {
 	protected abstract Object onRequest(Object context, Object theRequest) throws StateException;
 
 	public void setStateType(int newStateType) {
-		m_iStateType = newStateType;
+		iStateType = newStateType;
 	}
 
 	public void setSubState(State newState) {
-		m_vecSubStates.removeAllElements();
-		m_vecSubStates.addElement(newState);
+		vecSubStates.removeAllElements();
+		vecSubStates.addElement(newState);
 	}
 
 	public void setVecSubStates(Vector<State> newVecSubStates) {
-		m_vecSubStates = newVecSubStates;
+		vecSubStates = newVecSubStates;
 	}
 
 	@Override
 	public String toString() {
 		// check our state and if false go recursive to sub state and check
 		StringBuilder val = new StringBuilder(this.getClass().getName());
-		for (int i = 0; i < m_vecSubStates.size(); i++) {
-			val.append("/" + m_vecSubStates.elementAt(i).toString());
+		for (int i = 0; i < vecSubStates.size(); i++) {
+			val.append("/" + vecSubStates.elementAt(i).toString());
 		}
 		return val.toString();
 	}
@@ -456,8 +457,8 @@ abstract public class State implements IState {
 	public String toStringShort() {
 		// check our state and if false go recursive to sub state and check
 		StringBuilder val = new StringBuilder(toShortName(this.getClass().getName()));
-		for (int i = 0; i < m_vecSubStates.size(); i++) {
-			val.append("/" + toShortName(m_vecSubStates.elementAt(i).toString()));
+		for (int i = 0; i < vecSubStates.size(); i++) {
+			val.append("/" + toShortName(vecSubStates.elementAt(i).toString()));
 		}
 		return val.toString();
 	}
@@ -480,8 +481,8 @@ abstract public class State implements IState {
 		if (isSelfState(stateType)) {
 			return true;
 		}
-		for (int i = 0; i < m_vecSubStates.size(); i++) {
-			boolean retVal = m_vecSubStates.elementAt(i).validateState(stateType);
+		for (int i = 0; i < vecSubStates.size(); i++) {
+			boolean retVal = vecSubStates.elementAt(i).validateState(stateType);
 			if (true == retVal) {
 				return true;
 			}
@@ -500,8 +501,8 @@ abstract public class State implements IState {
 		List<Integer> lsubstate;
 		// do on exit from the current state and go on the vector
 		// go through the vector and call to on Exit
-		for (int i = 0; i < m_vecSubStates.size(); i++) {
-			lsubstate = m_vecSubStates.elementAt(i).getExactGlobalSetType();
+		for (int i = 0; i < vecSubStates.size(); i++) {
+			lsubstate = vecSubStates.elementAt(i).getExactGlobalSetType();
 			l.addAll(lsubstate);
 		}
 		Integer i = Integer.valueOf(getExactStateType());

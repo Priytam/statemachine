@@ -7,9 +7,9 @@ package com.p2.statemachine;
  * an action on the state.
  */
 public class StateException extends Exception {
-	private State m_stateNewState = null;
-	public Throwable detail;
 	private final static long serialVersionUID = 7324289884764967860L;
+	private State stateNewState = null;
+	public Throwable detail;
 
 	/**
 	 * StateException constructor comment.
@@ -55,7 +55,7 @@ public class StateException extends Exception {
 	 * @return State
 	 */
 	public State getNewState() {
-		return m_stateNewState;
+		return stateNewState;
 	}
 
 	/**
@@ -64,6 +64,6 @@ public class StateException extends Exception {
 	 * @param newNewState State
 	 */
 	public void setNewState(State newNewState) {
-		m_stateNewState = newNewState;
+		stateNewState = newNewState;
 	}
 }

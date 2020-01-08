@@ -11,19 +11,19 @@ public class StateMachineLatch {
 	/**
 	 * true if timedout before the event was processed
 	 */
-	private boolean m_expired = false;
+	private boolean expired = false;
 	/**
 	 * true if the StateMachine has processed the event
 	 */
-	private boolean m_released = false;
+	private boolean released = false;
 	/**
 	 * how long to wait for the StateMachine to process the event
 	 */
-	private long m_timeoutMilli;
+	private long timeoutMilli;
 	/**
 	 * The event that is being wrapped
 	 */
-	private Object m_event;
+	private Object event;
 	/**
 	 * Avoid race condition when StateMachine is about to handle this event and the timeout occurs.
 	 * When true the latch continues to sleep until released
@@ -35,8 +35,8 @@ public class StateMachineLatch {
 	private Throwable m_thrown;
 
 	public StateMachineLatch(Object event, long timeoutMilli) {
-		m_timeoutMilli = timeoutMilli;
-		m_event = event;
+		this.timeoutMilli = timeoutMilli;
+		this.event = event;
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class StateMachineLatch {
 	synchronized public boolean block() throws Throwable {
 		Thread.interrupted();
 		// may have already been handled
-		if (m_released) {
+		if (released) {
 			if (m_thrown != null) {
 				throw (m_thrown);
 			}
@@ -55,14 +55,14 @@ public class StateMachineLatch {
 		}
 		try {
 			do {
-				wait(m_timeoutMilli);
+				wait(timeoutMilli);
 			}
 			while (m_busy);
 		} catch (InterruptedException e) {
 			log.debug("caught Exception", e);
 		}
-		if (!m_released) {
-			m_expired = true;
+		if (!released) {
+			expired = true;
 			return false;
 		}
 		if (m_thrown != null) {
@@ -76,7 +76,7 @@ public class StateMachineLatch {
 	 */
 	synchronized public void release(Throwable thrown) {
 		m_thrown = thrown;
-		m_released = true;
+		released = true;
 		m_busy = false;
 		notifyAll();
 	}
@@ -85,14 +85,14 @@ public class StateMachineLatch {
 	 * @return true if timedout before the event was processed
 	 */
 	synchronized public boolean isExpired() {
-		return m_expired;
+		return expired;
 	}
 
 	/**
 	 * @return The event that is being wrapped
 	 */
 	synchronized public Object getEvent() {
-		return m_event;
+		return event;
 	}
 
 	/**

@@ -10,28 +10,28 @@ public class StopWatch implements IStopWatch {
 		RUNNING("Running"),
 		PAUSED("Paused");
 
-		private String m_name;
+		private String name;
 
 		private State(String name) {
-			m_name = name;
+			this.name = name;
 		}
 
 		@Override
 		public String getName() {
-			return m_name;
+			return name;
 		}
 	}
 
-	private static SynchronizedLong s_currentID = new SynchronizedLong(0);
+	private static SynchronizedLong currentID = new SynchronizedLong(0);
 
-	private long m_id = 0L;
-	private State m_state = State.STOPPED;
-	private long m_savedElapsedTime = 0L;
-	private long m_startTime = 0L;
+	private long id = 0L;
+	private State state = State.STOPPED;
+	private long savedElapsedTime = 0L;
+	private long startTime = 0L;
 
 	private StopWatch() {
 		super();
-		setId(s_currentID.increment());
+		setId(currentID.increment());
 	}
 
 	public static IStopWatch create() {
@@ -87,7 +87,7 @@ public class StopWatch implements IStopWatch {
 
 	@Override
 	public long id() {
-		return m_id;
+		return id;
 	}
 
 	@Override
@@ -102,31 +102,31 @@ public class StopWatch implements IStopWatch {
 	}
 
 	private void setId(long id) {
-		m_id = id;
+		this.id = id;
 	}
 
 	public State getState() {
-		return m_state;
+		return state;
 	}
 
 	public void setState(State state) {
-		m_state = state;
+		this.state = state;
 	}
 
 	public long getSavedElapsedTime() {
-		return m_savedElapsedTime;
+		return savedElapsedTime;
 	}
 
 	public void setSavedElapsedTime(long savedElapsedTime) {
-		m_savedElapsedTime = savedElapsedTime;
+		this.savedElapsedTime = savedElapsedTime;
 	}
 
 	public long getStartTime() {
-		return m_startTime;
+		return startTime;
 	}
 
 	public void setStartTime(long startTime) {
-		m_startTime = startTime;
+		this.startTime = startTime;
 	}
 
 	private boolean isRunning() {

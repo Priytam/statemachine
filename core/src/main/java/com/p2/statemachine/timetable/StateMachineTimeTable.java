@@ -21,9 +21,9 @@ public class StateMachineTimeTable implements Serializable {
 
 	private static transient Logger log = Logger.getLogger(StateMachineTimeTable.class);
 
-	private Map<Integer, IStopWatch> m_stateStopWatches = Collections.synchronizedMap(new HashMap<Integer, IStopWatch>());
+	private Map<Integer, IStopWatch> stateStopWatches = Collections.synchronizedMap(new HashMap<Integer, IStopWatch>());
 
-	private long m_lCurrentStateStartTime = 0;
+	private long lCurrentStateStartTime = 0;
 
 	public StateMachineTimeTable() {
 		super();
@@ -40,7 +40,7 @@ public class StateMachineTimeTable implements Serializable {
 
 		stopWatch.start();
 
-		m_lCurrentStateStartTime = System.currentTimeMillis();
+		lCurrentStateStartTime = System.currentTimeMillis();
 
 	}
 
@@ -78,38 +78,38 @@ public class StateMachineTimeTable implements Serializable {
 
 	private Collection<IStopWatch> getAllStopWatches() {
 		Collection<IStopWatch> stopWatches = new ArrayList<IStopWatch>();
-		synchronized (m_stateStopWatches) {
-			stopWatches.addAll(m_stateStopWatches.values());
+		synchronized (stateStopWatches) {
+			stopWatches.addAll(stateStopWatches.values());
 		}
 		return stopWatches;
 	}
 
 	public void fromMap(Map<Integer, IStopWatch> externalizedForm) {
-		synchronized (m_stateStopWatches) {
-			m_stateStopWatches.clear();
-			m_stateStopWatches.putAll(externalizedForm);
+		synchronized (stateStopWatches) {
+			stateStopWatches.clear();
+			stateStopWatches.putAll(externalizedForm);
 		}
 	}
 
 	public Map<Integer, IStopWatch> toMap() {
-		synchronized (m_stateStopWatches) {
-			return ImmutableMap.copyOf(m_stateStopWatches);
+		synchronized (stateStopWatches) {
+			return ImmutableMap.copyOf(stateStopWatches);
 		}
 	}
 
 	private void addStopWatch(int stateType, IStopWatch stopWatch) {
-		m_stateStopWatches.put(stateType, stopWatch);
+		stateStopWatches.put(stateType, stopWatch);
 	}
 
 	private IStopWatch getStopWatch(int key) {
-		return m_stateStopWatches.get(key);
+		return stateStopWatches.get(key);
 	}
 
-	public long getTimeInCurrentStateMillis() {
-		return m_lCurrentStateStartTime;
+	public long getStartTimeInCurrentStateMillis() {
+		return lCurrentStateStartTime;
 	}
 
-	public void setTimeInCurrentStateMillis(long startTime) {
-		m_lCurrentStateStartTime = startTime;
+	public void setStartTimeInCurrentStateMillis(long startTime) {
+		lCurrentStateStartTime = startTime;
 	}
 }
