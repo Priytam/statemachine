@@ -162,12 +162,12 @@ public abstract class AbstractStateMachine implements IStateMachine, Serializabl
         return statesTimeTable.getTimeInStateMillis(stateType);
     }
 
-    public final long getTimeInCurrentStateMillis() {
+    public final long getStartTimeInCurrentStateMillis() {
         return statesTimeTable.getStartTimeInCurrentStateMillis();
     }
 
 
-    public final void setTimeInCurrentStateMillis(long startTime) {
+    public final void setStartTimeInCurrentStateMillis(long startTime) {
         statesTimeTable.setStartTimeInCurrentStateMillis(startTime);
     }
 

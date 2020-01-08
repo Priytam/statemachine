@@ -14,10 +14,10 @@ public abstract class ExpirableState extends State {
     protected void performSpecificOnGlobalEntry(StateOwner owner, State fromState) {
         timer = new Timer();
         this.owner = owner;
-        schedule();
+        schedule(0);
     }
 
-    private void schedule() {
+    private void schedule(long millisSpent) {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -27,10 +27,14 @@ public abstract class ExpirableState extends State {
                     throw new RuntimeException(e);
                 }
             }
-        }, getExpiryTimeInMillis());
+        }, getExpiryTimeInMillis() - millisSpent);
     }
 
     private void handleExpiryEvent(StateOwner owner) throws StateException {
+        for (Object oState : vecSubStates) {
+            State state = (State) oState;
+            state.handleEvent(owner, new ExpiryEvent());
+        }
         handleEvent(owner, new ExpiryEvent());
     }
 
@@ -43,6 +47,19 @@ public abstract class ExpirableState extends State {
 
     public final void resetExpiry() {
         timer.cancel();
-        schedule();
+        schedule(0);
+    }
+
+    public void onRestore(StateOwner owner) {
+        super.onRestore(owner);
+        try {
+            long timeSpent = System.currentTimeMillis() - owner.getStateMachine().getStartTimeInCurrentStateMillis();
+            if (getExpiryTimeInMillis() - timeSpent <= 0) {
+                handleExpiryEvent(owner);
+            }
+            schedule(timeSpent);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
