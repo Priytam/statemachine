@@ -20,9 +20,9 @@ handling events synchronously and asynchronously both.
 If your system requires managing states like below consider this
 tool as your life saver
 <div>
-    <img src="doc/state0.png" height="200" width="300" title="State example 1" style="display: inline" align="right">
-    <img src="doc/state1.png" height="200" width="400" title="State example 1" style="display: inline" align="right">
-    <img src="doc/state2.png" height="200" width="400" title="State example 1" style="display: inline" align="right">
+    <img src="doc/state0.png" height="200" width="300" title="State example 1">
+    <img src="doc/state1.png" height="200" width="400" title="State example 1">
+    <img src="doc/state2.png" height="200" width="400" title="State example 1">
 </div>
 
 
