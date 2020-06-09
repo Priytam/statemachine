@@ -28,17 +28,18 @@ public class StateMachineLatchTest {
 
     @Test
     public void shouldRelease() throws Throwable {
-        long time = System.currentTimeMillis();
-        StateMachineLatch stateMachineLatch = new StateMachineLatch("", 2000);
+        StateMachineLatch stateMachineLatch = new StateMachineLatch("", 16000);
         new Thread( () -> {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(800);
                 stateMachineLatch.release(null);
             } catch (Throwable ignored) {
             }
         }).start();
+        long beforeBlock = System.currentTimeMillis();
         stateMachineLatch.block();
-        Assert.assertFalse(System.currentTimeMillis() - time < 2000);
+        long afterBlock = System.currentTimeMillis();
+        Assert.assertTrue(afterBlock - beforeBlock < 16000);
     }
 
     @Test

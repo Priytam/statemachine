@@ -58,7 +58,7 @@ public class StopWatchTest {
         Thread.sleep(6000);
         long l = stopWatch.elapsedMillis();
         stopWatch.restart();
-        Assert.assertTrue(l < stopWatch.elapsedMillis());
+        Assert.assertTrue(l > stopWatch.elapsedMillis());
     }
 
     @Test
