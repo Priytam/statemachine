@@ -7,7 +7,7 @@ buildscript {
     }
 }
 apply plugin: 'io.codearte.nexus-staging'
-apply plugin: 'java'
+apply plugin: 'java-library'
 
 group 'com.github.priytam'
 version "${STATE_MACHINE_VESRION}"
@@ -27,9 +27,21 @@ repositories {
 
 dependencies {
     compile group: 'concurrent', name: 'concurrent', version: '1.3.4'
-    compile group: 'com.google.guava', name: 'guava', version: '25.1-jre'
+    compile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
     compile group: 'log4j', name: 'log4j', version: '1.2.16'
     testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+
+    repositories {
+        repositories {
+            mavenCentral()
+            jcenter()
+        }
+    }
 }
 
 if (project.hasProperty('release')) {
@@ -54,13 +66,10 @@ if (project.hasProperty('release')) {
     allprojects {
         apply plugin: 'signing'
         apply plugin: 'maven'
-        apply plugin: 'jacoco'
-        apply plugin: 'jacoco'
 
         signing {
             sign configurations.archives
         }
-
         uploadArchives {
             repositories {
                 mavenDeployer {
@@ -72,12 +81,12 @@ if (project.hasProperty('release')) {
                         name project.name
                         description project.description
                         packaging 'jar'
-                        url 'https://github.com/priytam/auto'
+                        url 'https://github.com/Priytam/statemachine'
 
                         scm {
-                            connection 'scm:git:https://github.com/priytam/auto.git'
-                            developerConnection 'scm:git:git@github.com:/priytam/auto.git'
-                            url 'https://github.com/priytam/auto.git'
+                            connection 'scm:https://github.com/Priytam/statemachine.git'
+                            developerConnection 'scm:git:git@github.com:/priytam/statemachine.git'
+                            url 'https://github.com/Priytam/statemachine.git'
                         }
 
                         licenses {
@@ -87,7 +96,6 @@ if (project.hasProperty('release')) {
                                 distribution 'repo'
                             }
                         }
-
                         developers {
                             developer {
                                 id = 'pjpandey'
@@ -102,3 +110,9 @@ if (project.hasProperty('release')) {
     }
 }
 
+nexusStaging {
+    username = ossrhUser
+    password = ossrhPassword
+}
+
+/* use this command to publish library ./gradlew build -Prelease uploadArchives */
