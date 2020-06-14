@@ -4,7 +4,7 @@ SMMS provides state management in simple and effective way, has capability of
 handling events synchronously and asynchronously both.
 
 
-[![GitHub license](https://img.shields.io/github/license/Priytam/statemachine.svg)](https://github.com/Priytam/statemachine/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/Priytam/statemachine)](https://github.com/Priytam/statemachine/blob/master/LICENSE)
 [![Build Status](https://travis-ci.org/Priytam/statemachine.svg?branch=master)](https://travis-ci.org/Priytam/statemachine)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.priytam/statemachine/badge.svg)](https://search.maven.org/search?q=g:com.github.priytam%20AND%20a:statemachine)
 
