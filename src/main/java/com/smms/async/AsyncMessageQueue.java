@@ -62,7 +62,7 @@ public class AsyncMessageQueue implements Runnable, IAsyncMessageQueue {
 
     /**
      * Remove all pending events from the queue
-     * @param operationID
+     * @param operationID {@link String}
      */
     @Override
     public void clearPendingMessages(String operationID) {

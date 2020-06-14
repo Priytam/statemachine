@@ -42,14 +42,14 @@ public interface IStateMachine extends IMementoOriginator<IStateMachine> {
 	boolean validateState(int type);
 
 	/**
-	 * @param state
+	 * @param state {@link State}
 	 */
 	void recoverState(State state);
 
 	/**
 	 * record state entry/exit for time logging
 	 *
-	 * @param state
+	 * @param state {@link State}
 	 */
 	void recordStateEntry(State state);
 
@@ -64,8 +64,8 @@ public interface IStateMachine extends IMementoOriginator<IStateMachine> {
 	/**
 	 * Returns the number of millisecond in a given state
 	 *
-	 * @param type
-	 * @return
+	 * @param type int
+	 * @return long
 	 */
 	long getTimeInStateMillis(int type);
 

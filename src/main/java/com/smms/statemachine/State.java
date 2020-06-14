@@ -68,6 +68,7 @@ abstract public class State implements IState {
      * @param stateOwner Object
      * @param newState   State
      * @param index      int
+     * @throws StateException while changing state
      */
     public void changeState(StateOwner stateOwner, State newState, int index) throws StateException {
 
@@ -104,11 +105,6 @@ abstract public class State implements IState {
     /**
      * do something after all sub states has been changed.
      * the method returns a new state if it needs to be replaced.
-     *
-     * @return :
-     * @throws :
-     * @param:
-     * @see :
      */
     abstract public State completeHandleEvent(Object context, Object theEvent) throws StateException;
 
