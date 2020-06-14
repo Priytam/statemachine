@@ -1,8 +1,8 @@
 package com.smms.statemachine.timetable;
 
-import com.smms.stopwatch.IStopWatch;
-import com.smms.stopwatch.StopWatch;
 import com.google.common.collect.ImmutableMap;
+import com.stopwatch.IStopWatch;
+import com.stopwatch.StopWatch;
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;
@@ -81,7 +81,7 @@ public class StateMachineTimeTable implements Serializable {
 	}
 
 	private Collection<IStopWatch> getAllStopWatches() {
-		Collection<IStopWatch> stopWatches = new ArrayList<IStopWatch>();
+		Collection<IStopWatch> stopWatches = new ArrayList<>();
 		synchronized (stateStopWatches) {
 			stopWatches.addAll(stateStopWatches.values());
 		}

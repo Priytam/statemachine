@@ -4,7 +4,7 @@ import com.smms.memento.IMemento;
 import com.smms.statemachine.iface.IStateMachine;
 import com.smms.statemachine.iface.StateOwner;
 import com.smms.statemachine.timetable.StateMachineTimeTable;
-import com.smms.stopwatch.IStopWatch;
+import com.stopwatch.IStopWatch;
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;
@@ -206,7 +206,7 @@ public abstract class AbstractStateMachine implements IStateMachine, Serializabl
     private static class Memento implements IMemento<IStateMachine> {
         private static final long serialVersionUID = -8129574563345689051L;
 
-        private Map<Integer, IStopWatch> m_timeTable = new HashMap<Integer, IStopWatch>();
+        private Map<Integer, IStopWatch> m_timeTable = new HashMap<>();
         private int[] m_states = null;
 
         public Memento() {

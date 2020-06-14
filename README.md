@@ -4,12 +4,11 @@ SMMS provides state management in simple and effective way, has capability of
 handling events synchronously and asynchronously both.
 
 
-[![GitHub license](https://img.shields.io/github/license/Priytam/auto.svg)](https://github.com/Priytam/auto/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/Priytam/statemachine.svg)](https://github.com/Priytam/statemachine/blob/master/LICENSE)
 [![Build Status](https://travis-ci.org/Priytam/statemachine.svg?branch=master)](https://travis-ci.org/Priytam/statemachine)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.priytam/framework/badge.svg)](https://search.maven.org/search?q=g:com.github.priytam%20AND%20a:framework)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.priytam/statemachine/badge.svg)](https://search.maven.org/search?q=g:com.github.priytam%20AND%20a:statemachine)
 
 [![HitCount](http://hits.dwyl.io/Priytam/statemachine.svg?style=svg)](http://hits.dwyl.io/Priytam/statemachine)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?)](http://makeapullrequest.com)
 [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 
