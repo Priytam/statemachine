@@ -36,11 +36,11 @@ If your system requires managing complex states like below consider this tool as
 # Note : Below doc is not yet complete 
 
 ## Creating state machine
-** There are two types of events
+**There are two types of events**
 1. SyncStateMachine (all events to state will be handled in sync)
 2. StateMachine (Events will be handled in async manner)
 
-** Creating state machine **
+*Creating async state machine*
 ```text
      new StateMachine(new ContextObject(), 10, 3);
 ```
@@ -49,7 +49,7 @@ arguments are
 1. Max number of pending events 
 1. Thread pool
 
-Creating async state machine
+*Creating sync state machine*
 ```text
      new SyncStateMachine(new ContextObject());
 ```
@@ -59,10 +59,10 @@ arguments are
 **[Back to top](#table-of-contents)**
 
 ## Posting event
-An event can be posted to stateMachine, state machine calls current state's onEvent method
-On async StateMachine postEvent return immediately and perform state's onEvent method on a separate thread but on 
-sync StateMachine returns when state's onEvent completes, there is postEventAndWait(event, waitTimeInMillis) and 
-throws exception if time expires.
+An event can be posted to stateMachine, postEvent on stateMachine calls current state's onEvent method.
+On async StateMachine's postEvent call return immediately and perform state's onEvent method on a separate 
+thread but on sync StateMachine it returns when state's onEvent completes, there is postEventAndWait(event, waitTimeInMillis) 
+on async stateMachine that waits given time and throws exception if time expires.
 
 ```text
    stateMachine.postEvent(event);
@@ -73,7 +73,7 @@ an event is a subClass of Object class and will be passed as argument on state's
 **[Back to top](#table-of-contents)**
 
 ## Initialize(begin) state
-** Initialize state machine (beginning state)
+*Initialize state machine (beginning state)*
 ```text
      stateMachine.initState(new BeginState());
 ```
@@ -82,20 +82,59 @@ where BeginState is subClass of State class
 **[Back to top](#table-of-contents)**
 
 ## Creating states
+*To create a state extends State class, it primarily asks to implement onEntry, onEvent and onExit*
+
+***onEntry***
+```text
+public void onEntry(Object context, State fromState) throws StateException
+```
+- gets called at entry of any state
+- context is the object passed while creating stateMachine
+- fromState the state from which system is transiting and will be null if it is beginning state 
+
+***onExit***
+
+```text
+    public void onExit(Object context, State toState) throws StateException
+```
+- gets called at exist of any state
+- context is the object passed while creating stateMachine
+- toState is the state to which system is transiting and will be null if it is beginning state 
+
+***onEvent***   
+```text
+protected State onEvent(Object context, Object theEvent) throws StateException {
+```
+- gets called every time postEvent is called on stateMachine
+- context is the object passed while creating stateMachine
+- theEvent is the event which is posted on the state machine
+- if a new State is returned from this method and system will transit to that state
+- if null or same State is returned system will stay in same state
+
+*other functionalities can be overridden*
+1. void doConstantly(Object context) 
+1. Object onRequest(Object context, Object theRequest)
+1. State completeHandleEvent(Object context, Object theEvent)
 
 **[Back to top](#table-of-contents)**
 
 ## Persisting State
+*todo: cover detailed explanation**
+- save state's number to db
+_ restore from momento
+
 **[Back to top](#table-of-contents)**
 
 ## Example1
 Let's write a system which manage states as below diagram
 ![Example one state diagram](doc/state0.png)
 
-*States*
-In above diagram system has 3 states (Opened, Closed and Locked)
+**States**
+*In above diagram system has 3 states (Opened, Closed and Locked)*
 
-**Opened State implementation if CloseEvent is posted on this state then state will be changed to Closed**
+*Opened State implementation*
+
+if CloseEvent is posted on this state then state will be changed to Closed**
 ```java
 public class OpenedState extends AbstractState {
     private static final Logger log = Logger.getLogger(OpenedState.class);
@@ -124,7 +163,9 @@ public class OpenedState extends AbstractState {
 }
 ```
 
-**Closed State implementation if theEvent is of type LockEvent change state to Locked similarly for OpenEvent.** 
+*Closed State implementation* 
+
+if theEvent is of type LockEvent change state to Locked similarly for OpenEvent.** 
 ```java
 public class ClosedState extends AbstractState {
     private static final Logger log = Logger.getLogger(ClosedState.class);
@@ -157,7 +198,9 @@ public class ClosedState extends AbstractState {
 
 ```
 
-**Locked State implementation if theEvent is of type UnlockEvent change state to Closed**
+*Locked State implementation*
+
+if theEvent is of type UnlockEvent change state to Closed**
 ```java
 public class LockedState extends AbstractState {
     private static final Logger log = Logger.getLogger(LockedState.class);
@@ -187,12 +230,13 @@ public class LockedState extends AbstractState {
 }
 ```
 
-**Event on states**
-There are four events can be performed on system (Open, Close, Lock and Unlock)
-Create classes per events like below
+**Events**
+*There are four events can be performed on system (Open, Close, Lock and Unlock)*
+Create an empty class per events for identifying event like below
 ![State Events](doc/statEvents.png)
 
 **State Handler** 
+*Post an event to change the state*
  ```java
  public class StateHandler {
      public static final int MAX_EVENTS = 40;
@@ -259,7 +303,7 @@ Create classes per events like below
  }
 ```
 
-** example of stateHandler**
+**example of stateHandler**
 
 ```java
 public class DoorStateTest {
@@ -301,6 +345,6 @@ public class DoorStateTest {
 }
 ```
 
-** Output is
+**Output is**
 
 ![State Events](doc/output.png)
