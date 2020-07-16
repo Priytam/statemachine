@@ -132,9 +132,11 @@ _ restore from momento
 
 Let's write a system which manage states as below diagram
 ![Example state diagram](doc/state0.png)
+
 [Complete implementation can be found here](https://github.com/Priytam/statemachine/tree/master/src/main/java/com/smms/example) 
 
 **States**
+
 [Click to see state complete implementation](https://github.com/Priytam/statemachine/tree/master/src/main/java/com/smms/example/state) 
 
 *In above diagram system has 3 states (Opened, Closed and Locked)*
@@ -240,6 +242,7 @@ public class LockedState extends AbstractState {
 **Events**
 
 *There are four events can be performed on system (Open, Close, Lock and Unlock)*
+
 [Click to see event classes](https://github.com/Priytam/statemachine/tree/master/src/main/java/com/smms/example/event) 
 
 Create an empty class per events for identifying event like below
