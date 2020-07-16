@@ -36,16 +36,16 @@ If your system requires managing complex states like below consider this tool as
 # Note : Below doc is not yet complete 
 
 ## Creating state machine
-**There are two types of events**
-1. SyncStateMachine (all events to state will be handled in sync)
-2. StateMachine (Events will be handled in async manner)
+**There are two types of state machine**
+1. SyncStateMachine (Sync processing of an event to it)
+2. StateMachine (Async processing of an event to it)
 
 *Creating async state machine*
 ```text
      new StateMachine(new ContextObject(), 10, 3);
 ```
-arguments are 
-1. an object that will be passed in each state onEvent call
+*arguments are*
+1. A context that will be passed on each life cycle of a state
 1. Max number of pending events 
 1. Thread pool
 
@@ -53,16 +53,16 @@ arguments are
 ```text
      new SyncStateMachine(new ContextObject());
 ```
-arguments are 
-1. an object that will be passed in each state onEvent call
+*arguments are*
+1. A context that will be passed on each life cycle of a state
 
 **[Back to top](#table-of-contents)**
 
 ## Posting event
 An event can be posted to stateMachine, postEvent on stateMachine calls current state's onEvent method.
 On async StateMachine's postEvent call return immediately and perform state's onEvent method on a separate 
-thread but on sync StateMachine it returns when state's onEvent completes, there is postEventAndWait(event, waitTimeInMillis) 
-on async stateMachine that waits given time and throws exception if time expires.
+thread but on sync StateMachine it returns when state's onEvent completes, there is also postEventAndWait(event, waitTimeInMillis) 
+method on async stateMachine that waits for the given time and throws exception if time expires.
 
 ```text
    stateMachine.postEvent(event);
