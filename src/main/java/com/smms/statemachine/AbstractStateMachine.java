@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * User: Priytam Jee Pandey
@@ -67,8 +68,7 @@ public abstract class AbstractStateMachine implements IStateMachine, Serializabl
         if (null == getState()) {
             return null;
         }
-        List<Integer> lstState = getState().getExactGlobalSetType();
-        return lstState;
+        return getState().getExactGlobalSetType();
     }
 
     @Override
@@ -141,8 +141,7 @@ public abstract class AbstractStateMachine implements IStateMachine, Serializabl
             newState.onGlobalEntry(getOwner(), oldState);
             return newState;
         } catch (StateException e) {
-            log.error("replaceState() - Failed to replace state for " + getContext() +
-                    " the current state " + getState().toString());
+            log.error("replaceState() - Failed to replace state for " + getContext() + " the current state " + getState().toString());
             throw e;
         }
     }
@@ -207,14 +206,14 @@ public abstract class AbstractStateMachine implements IStateMachine, Serializabl
         private static final long serialVersionUID = -8129574563345689051L;
 
         private Map<Integer, IStopWatch> m_timeTable = new HashMap<>();
-        private int[] m_states = null;
+        private int[] states = null;
 
         public Memento() {
             super();
         }
 
         public void setStates(int[] states) {
-            m_states = states;
+            this.states = states;
         }
 
         public void setTimeTable(Map<Integer, IStopWatch> timeTable) {

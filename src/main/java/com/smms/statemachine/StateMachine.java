@@ -33,9 +33,11 @@ public class StateMachine extends AbstractStateMachine implements Serializable, 
 	final transient private static Logger log = Logger.getLogger(StateMachine.class);
 	private transient AsyncMessageQueue asyncMessageQueue;
 	private final transient ThreadLocal<Integer> handleEventDepth = new ThreadLocal<Integer>();
+	private ThreadPoolExecutor pool;
 
 	public StateMachine(Object context, int maxPendingEvents, ThreadPoolExecutor threadPool) {
 		super(context);
+		this.pool = threadPool;
 		asyncMessageQueue = new AsyncMessageQueue(maxPendingEvents, threadPool, this);
 		StateMachine machine = this;
 		setOwner(new StateOwner() {
@@ -73,6 +75,11 @@ public class StateMachine extends AbstractStateMachine implements Serializable, 
 		return asyncMessageQueue.postMessage(event);
 	}
 
+	public void shutDown() {
+		clearPendingEvents();
+		pool.shutdown();
+	}
+
 	public boolean postEventAndWait(Object event, long timeoutMilli) throws Throwable {
 		if (inHandleEvent()) {
 			throw new IllegalStateException("Trying to call postEventAndWait while handling another event within the same thread would have cause a deadlock");
@@ -86,6 +93,7 @@ public class StateMachine extends AbstractStateMachine implements Serializable, 
 	}
 
 	public void setThreadPool(ThreadPoolExecutor threadPool) {
+		this.pool = threadPool;
 		asyncMessageQueue.setThreadPool(threadPool);
 	}
 
