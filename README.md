@@ -15,27 +15,26 @@ handling events synchronously and asynchronously both.
 ## Purpose
 *To write a state machine system in easy and effective way*
 
-If your system requires managing complex states like below consider this tool as your life saver
-<div>
-    <img src="doc/state0.png" height="200" width="300" title="State example 1">
-    <img src="doc/state1.png" height="200" width="400" title="State example 1">
-    <img src="doc/state2.png" height="200" width="400" title="State example 1">
-</div>
+If your system requires managing complex states this tool as your life saver
 
-
+![Example state diagram](doc/state0.png)
 
 ## Table of Contents
+Keep below terms in mind while reading this doc
+- StateMachine 
+- State(s) in a StateMachine (for example Opened, Closed and Locked in above diagram)
+- Events on StateMachine/State (for example open, close, lock and unlock in above diagram)
+- Transition of one state to another (for example close event on Opened state will transit system to Closed State)
 
   1. [Creating state machine](#creating-state-machine)
-  1. [Posting an event](#posting-event)
-  1. [Initial state](#initializebegin-state)
+  1. [Posting an event](#posting-an-event)
+  1. [Initial state](#initialbegin-state)
   1. [Creating states](#creating-states)
-  1. [Persisting state](#persisting-state)
-  1. [Example1](#example1)
-
-# Note : Below doc is not yet complete 
+  1. [Persisting state machine](#persisting-state-machine)
+  1. [Example](#example)
 
 ## Creating state machine
+
 **There are two types of state machine**
 1. SyncStateMachine (Sync processing of an event to it)
 2. StateMachine (Async processing of an event to it)
@@ -58,7 +57,7 @@ If your system requires managing complex states like below consider this tool as
 
 **[Back to top](#table-of-contents)**
 
-## Posting event
+## Posting an event
 An event can be posted to stateMachine, postEvent on stateMachine calls current state's onEvent method.
 On async StateMachine's postEvent call return immediately and perform state's onEvent method on a separate 
 thread but on sync StateMachine it returns when state's onEvent completes, there is also postEventAndWait(event, waitTimeInMillis) 
@@ -72,10 +71,10 @@ an event is a subClass of Object class and will be passed as argument on state's
 
 **[Back to top](#table-of-contents)**
 
-## Initialize(begin) state
-*Initialize state machine (beginning state)*
+## Initial(begin) state
+*Initial state of a state machine (beginning state)*
 ```text
-     stateMachine.initState(new BeginState());
+    stateMachine.initState(new BeginState());
 ```
 where BeginState is subClass of State class
 
@@ -86,7 +85,7 @@ where BeginState is subClass of State class
 
 ***onEntry***
 ```text
-public void onEntry(Object context, State fromState) throws StateException
+    public void onEntry(Object context, State fromState) throws StateException
 ```
 - gets called at entry of any state
 - context is the object passed while creating stateMachine
@@ -103,7 +102,7 @@ public void onEntry(Object context, State fromState) throws StateException
 
 ***onEvent***   
 ```text
-protected State onEvent(Object context, Object theEvent) throws StateException {
+    protected State onEvent(Object context, Object theEvent) throws StateException {
 ```
 - gets called every time postEvent is called on stateMachine
 - context is the object passed while creating stateMachine
@@ -118,18 +117,22 @@ protected State onEvent(Object context, Object theEvent) throws StateException {
 
 **[Back to top](#table-of-contents)**
 
-## Persisting State
+## Persisting State Machine
 *todo: cover detailed explanation**
 - save state's number to db
 _ restore from momento
 
 **[Back to top](#table-of-contents)**
 
-## Example1
+## Example
+
+
 Let's write a system which manage states as below diagram
-![Example one state diagram](doc/state0.png)
+![Example state diagram](doc/state0.png)
+[Complete implementation can be found here](https://github.com/Priytam/statemachine/tree/master/src/main/java/com/smms/example) 
 
 **States**
+[Click to see state complete implementation](https://github.com/Priytam/statemachine/tree/master/src/main/java/com/smms/example/state) 
 
 *In above diagram system has 3 states (Opened, Closed and Locked)*
 
@@ -232,7 +235,10 @@ public class LockedState extends AbstractState {
 ```
 
 **Events**
+
 *There are four events can be performed on system (Open, Close, Lock and Unlock)*
+[Click to see event classes](https://github.com/Priytam/statemachine/tree/master/src/main/java/com/smms/example/event) 
+
 Create an empty class per events for identifying event like below
 ![State Events](doc/statEvents.png)
 
