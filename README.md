@@ -17,14 +17,15 @@ handling events synchronously and asynchronously both.
 
 If your system requires managing complex states this tool as your life saver
 
-![Example state diagram](doc/state0.png)
 
 ## Keep below terms in mind while reading this doc
 
 - StateMachine 
-- State(s) in a StateMachine (for example Opened, Closed and Locked in above diagram)
-- Events on StateMachine/State (for example open, close, lock and unlock in above diagram)
+- State(s) in a StateMachine (for example Opened, Closed and Locked in below diagram)
+- Events on StateMachine/State (for example open, close, lock and unlock in below diagram)
 - Transition of one state to another (for example close event on Opened state will transit system to Closed State)
+
+![Example state diagram](doc/state0.png)
 
 ## Table of Contents
 
