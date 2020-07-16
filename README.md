@@ -130,6 +130,7 @@ Let's write a system which manage states as below diagram
 ![Example one state diagram](doc/state0.png)
 
 **States**
+
 *In above diagram system has 3 states (Opened, Closed and Locked)*
 
 *Opened State implementation*
@@ -165,7 +166,7 @@ public class OpenedState extends AbstractState {
 
 *Closed State implementation* 
 
-if theEvent is of type LockEvent change state to Locked similarly for OpenEvent.** 
+if theEvent is of type LockEvent change state to Locked similarly for OpenEvent. 
 ```java
 public class ClosedState extends AbstractState {
     private static final Logger log = Logger.getLogger(ClosedState.class);
@@ -303,7 +304,7 @@ Create an empty class per events for identifying event like below
  }
 ```
 
-**example of stateHandler**
+**Example of stateHandler**
 
 ```java
 public class DoorStateTest {
